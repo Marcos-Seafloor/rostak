@@ -1,6 +1,11 @@
-import rospy
+import rclpy
 from rostak.roscot_fix import RosCotFix
 
+def main():
+    rclpy.init()
+    node = RosCotFix()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
 if __name__ == "__main__":
-    RosCotFix()
-    rospy.spin()
+    main()
