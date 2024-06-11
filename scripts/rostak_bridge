@@ -1,6 +1,10 @@
-import asyncio
+import rclpy
 from rostak.rostak_bridge import RosTakBridge
 
-if __name__ == '__main__':
+def main():
+    rclpy.init()
     bridge = RosTakBridge()
-    asyncio.run(bridge.run())
+    rclpy.spin(bridge)
+
+if __name__ == '__main__':
+    main()
