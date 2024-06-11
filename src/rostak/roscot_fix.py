@@ -4,7 +4,7 @@ from rostak.cot_utility import CotUtility
 from std_msgs.msg import String
 from sensor_msgs.msg import NavSatFix
 
-class RosCotFix:
+class RosCotFix(Node):
     def __init__(self):
         super().__init__("roscot_fix")
         self.declare_parameter('cot_params', '')
