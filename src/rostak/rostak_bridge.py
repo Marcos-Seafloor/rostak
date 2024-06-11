@@ -4,7 +4,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 
-class RosTakBridge:
+class RosTakBridge(Node):
     """
     Proxy CoT messages (xml strings) between ROS and TAK agents.
     """
@@ -57,12 +57,13 @@ class RosTakBridge:
             for task in done:
                 self.get_logger().info(f"Task completed: {task}")
     
-class RosCotWorker(pytak.QueueWorker):
+class RosCotWorker(pytak.QueueWorker, Node):
     """
     listen for CoT from ROS and enqueue for TAK
     """
     def __init__(self, queue: asyncio.Queue, config: dict) -> None:
-        super().__init__(queue, config)
+        pytak.QueueWorker.__init__(self, queue, config) 
+        Node.__init__(self, "roscot_worker")
         self.aio = asyncio.get_event_loop()
 
     def queue_cotmsg(self, cotmsg):
@@ -77,12 +78,13 @@ class RosCotWorker(pytak.QueueWorker):
         while True:
             await asyncio.sleep(0.25)
     
-class RosTakReceiver(pytak.RXWorker):
+class RosTakReceiver(pytak.RXWorker, Node):
     """
     receive CoT from TAK and publish to ROS
     """
     def __init__(self, queue: asyncio.Queue, config: dict, reader: asyncio.Protocol) -> None:
-        super().__init__(queue, config, reader)
+        pytak.RXWorker.__init__(self, queue, config, reader)
+        Node.__init__(self, "rostak_receiver") 
 
     async def run(self):
         self.pub = self.create_publisher(String, 'tak_rx', 10)
@@ -93,6 +95,11 @@ class RosTakReceiver(pytak.RXWorker):
             msg.data = cot.decode()
             self.pub.publish(msg)
 
-if __name__ == '__main__':
+def main():
+    rclpy.init()
     bridge = RosTakBridge()
     asyncio.run(bridge.run())
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
