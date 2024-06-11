@@ -1,8 +1,8 @@
 import asyncio
 import pytak
-import rospy
+import rclpy
+from rclpy.node import Node
 from std_msgs.msg import String
-from configparser import ConfigParser
 
 class RosTakBridge:
     """
@@ -10,15 +10,23 @@ class RosTakBridge:
     """
 
     def __init__(self):
-        rospy.init_node("rostak_bridge")
-        self.config = ConfigParser()['DEFAULT']
-        self.config["COT_URL"] = rospy.get_param('~COT_URL', "")
-        self.config["PYTAK_TLS_CLIENT_CERT"] = rospy.get_param('~PYTAK_TLS_CLIENT_CERT', "")
-        self.config["PYTAK_TLS_CLIENT_KEY"] = rospy.get_param('~PYTAK_TLS_CLIENT_KEY', "")
-        self.config["PYTAK_TLS_CLIENT_CAFILE"] = rospy.get_param('~PYTAK_TLS_CLIENT_CAFILE', "")
-        self.config["PYTAK_TLS_CLIENT_CIPHERS"] = rospy.get_param('~PYTAK_TLS_CLIENT_CIPHERS', "")
-        self.config["PYTAK_TLS_DONT_VERIFY"] = rospy.get_param('~PYTAK_TLS_DONT_VERIFY', "")
-        self.config["PYTAK_TLS_DONT_CHECK_HOSTNAME"] = rospy.get_param('~PYTAK_TLS_DONT_CHECK_HOSTNAME', "")
+        super().__init__("rostak_bridge")
+        self.declare_parameter('COT_URL', "")
+        self.declare_parameter('PYTAK_TLS_CLIENT_CERT', "")
+        self.declare_parameter('PYTAK_TLS_CLIENT_KEY', "")
+        self.declare_parameter('PYTAK_TLS_CLIENT_CAFILE', "")
+        self.declare_parameter('PYTAK_TLS_CLIENT_CIPHERS', "")
+        self.declare_parameter('PYTAK_TLS_DONT_VERIFY', "")
+        self.declare_parameter('PYTAK_TLS_DONT_CHECK_HOSTNAME', "")
+        
+        self.config = {}
+        self.config["COT_URL"] = self.get_parameter('COT_URL').value
+        self.config["PYTAK_TLS_CLIENT_CERT"] = self.get_parameter('PYTAK_TLS_CLIENT_CERT').value
+        self.config["PYTAK_TLS_CLIENT_KEY"] = self.get_parameter('PYTAK_TLS_CLIENT_KEY').value 
+        self.config["PYTAK_TLS_CLIENT_CAFILE"] = self.get_parameter('PYTAK_TLS_CLIENT_CAFILE').value
+        self.config["PYTAK_TLS_CLIENT_CIPHERS"] = self.get_parameter('PYTAK_TLS_CLIENT_CIPHERS').value
+        self.config["PYTAK_TLS_DONT_VERIFY"] = self.get_parameter('PYTAK_TLS_DONT_VERIFY').value
+        self.config["PYTAK_TLS_DONT_CHECK_HOSTNAME"] = self.get_parameter('PYTAK_TLS_DONT_CHECK_HOSTNAME').value
         
     async def run(self):
 
@@ -47,7 +55,7 @@ class RosTakBridge:
             )
 
             for task in done:
-                rospy.loginfo(f"Task completed: {task}")
+                self.get_logger().info(f"Task completed: {task}")
     
 class RosCotWorker(pytak.QueueWorker):
     """
@@ -63,8 +71,8 @@ class RosCotWorker(pytak.QueueWorker):
         )
     
     async def run(self):
-        rospy.loginfo(" *** Subscribing to tak_tx ***")
-        rospy.Subscriber("tak_tx", String, self.queue_cotmsg)
+        self.get_logger().info(" *** Subscribing to tak_tx ***")
+        self.create_subscription(String, "tak_tx", self.queue_cotmsg, 10)
         # TODO: better way to keep async worker running so ROS callback threading continues
         while True:
             await asyncio.sleep(0.25)
@@ -77,13 +85,13 @@ class RosTakReceiver(pytak.RXWorker):
         super().__init__(queue, config, reader)
 
     async def run(self):
-        pub = rospy.Publisher('tak_rx', String, queue_size=10)
-        msg = String()
-        rospy.loginfo(" *** Publishing on tak_rx ***")
+        self.pub = self.create_publisher(String, 'tak_rx', 10)
+        self.get_logger().info(" *** Publishing on tak_rx ***")
         while True:
             cot = await self.reader.readuntil(separator=b'</event>')
+            msg = String()
             msg.data = cot.decode()
-            pub.publish(msg)
+            self.pub.publish(msg)
 
 if __name__ == '__main__':
     bridge = RosTakBridge()
