@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from rostak.cot_utility import CotUtility
 from std_msgs.msg import String
-from sensor_msgs.msg import NavSatFix
+from mavros_msgs.msg import NavSatFix
 
 class RosCotFix(Node):
     def __init__(self):
@@ -14,7 +14,7 @@ class RosCotFix(Node):
         self.util = CotUtility(config_path)
         self.rate = self.get_parameter('rate').value
         self.tx = self.create_publisher(String, 'tak_tx', 1)
-        self.create_subscription(NavSatFix, "fix", self.publish_fix, 1)
+        self.create_subscription(NavSatFix, "mavros/global_position/global", self.publish_fix, 1)
         self.get_logger().info(str(self.util.get_config()))
 
     def publish_fix(self, msg):
