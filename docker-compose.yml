@@ -1,0 +1,12 @@
+version: '3'
+services:
+  rostak:
+    build: .
+    environment:
+      - ROS_DOMAIN_ID=0  
+      - PYTAK_TLS_CLIENT_CERT=/rostak_ws/src/rostak/config/client_cert.pem
+      - PYTAK_TLS_CLIENT_KEY=/rostak_ws/src/rostak/config/client_key.pem
+      - PYTAK_TLS_DONT_VERIFY=true
+    volumes:
+      - ./config/client_cert.pem:/rostak_ws/src/rostak/config/client_cert.pem
+      - ./config/client_key.pem:/rostak_ws/src/rostak/config/client_key.pem
