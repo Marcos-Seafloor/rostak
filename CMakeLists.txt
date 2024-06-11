@@ -1,25 +1,29 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.8)
 project(rostak)
 
-find_package(catkin REQUIRED COMPONENTS
-  rospy
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(rclpy REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+
+install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+
+install(PROGRAMS
+  scripts/rostak_bridge
+  scripts/roscot_fix
+  DESTINATION lib/${PROJECT_NAME}
 )
 
-catkin_package()
+ament_python_install_package(${PROJECT_NAME})
 
-catkin_python_setup()
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
-
-catkin_install_python(PROGRAMS
-    scripts/rostak_bridge
-    scripts/roscot_fix
-    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-install(DIRECTORY doc DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-install(DIRECTORY config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-install(DIRECTORY secrets DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+ament_package()
