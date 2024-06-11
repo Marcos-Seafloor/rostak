@@ -16,8 +16,8 @@ See pytak's readme for more information.
 - `tak_tx`: transmits CoT xml strings on this topic to TAK
 - `tak_rx`: receives CoT xml strings from TAK and publishes on this topic
 
-There is a built-in listener for `/fix`, so CoT status messages automatically
-get sent to TAK.
+There is a built-in listener for `/mavros/global_position/global`, so CoT status messages 
+automatically get sent to TAK when using mavros as the GPS source.
 
 For other CoT messages you'd like to send, just publish the xml string to `tak_tx`.
 For receiving messages, subscribe to `tak_rx` and process the CoT xml string as desired.
