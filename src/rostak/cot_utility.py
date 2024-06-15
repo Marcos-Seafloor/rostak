@@ -60,9 +60,21 @@ class CotUtility:
         })
         
         ET.SubElement(detail, "takv", attrib={
-            "platform": "westpointrobotics/rostak"
+            "platform": "seafloor/rostak"
+        })
+
+        # TODO: Pull course from mavros /mavros/global_position/compass_hdg messages
+        # TODO: Pull speed from mavros /mavros/global_position/raw/gps_vel messages
+        ET.SubElement(detail, "track", attrib={
+            "course": "132.16",
+            "speed": "20.5"
         })
         
+        # TODO: Pull battery from mavros /mavros/battery messages
+        ET.SubElement(detail, "status", attrib={
+            "battery": "99.96"
+        })
+
         return cot
 
     def new_chat(self, text, stale_in = 84600):
