@@ -2,6 +2,8 @@ from datetime import datetime, timezone, timedelta
 import uuid
 import xml.etree.ElementTree as ET
 import yaml
+import rospy
+from mavros_msgs.msg import VFR_HUD
 
 ISO_8601_UTC = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -18,6 +20,11 @@ class CotUtility:
             "latitude": "0.0",
             "longitude": "0.0",
             "altitude": "0.0"
+        }
+
+        self.last_details = {
+            "course": "30.0",
+            "speed": "1.0"
         }
 
     def new_cot(self, stale_in = 60) -> ET.Element:
@@ -63,11 +70,9 @@ class CotUtility:
             "platform": "seafloor/rostak"
         })
 
-        # TODO: Pull course from mavros /mavros/vfr_hud heading messages
-        # TODO: Pull speed from mavros /mavros/vfr_hud groundspeed messages converted to knots
         ET.SubElement(detail, "track", attrib={
-            "course": "132.16",
-            "speed": "20.5"
+            "course": self.last_details["course"],
+            "speed": self.last_details["speed"]
         })
         
         # TODO: Pull battery from mavros /mavros/battery messages
