@@ -63,8 +63,8 @@ class CotUtility:
             "platform": "seafloor/rostak"
         })
 
-        # TODO: Pull course from mavros /mavros/global_position/compass_hdg messages
-        # TODO: Pull speed from mavros /mavros/global_position/raw/gps_vel messages
+        # TODO: Pull course from mavros /mavros/vfr_hud heading messages
+        # TODO: Pull speed from mavros /mavros/vfr_hud groundspeed messages converted to knots
         ET.SubElement(detail, "track", attrib={
             "course": "132.16",
             "speed": "20.5"
