@@ -28,9 +28,9 @@ class CotUtility:
         
         return cot
 
-    def new_status_msg(self, stale_in = 60, heading = 0) -> str:
+    def new_status_msg(self, stale_in = 60, heading = 0, groundspeed = 0.0) -> str:
         return ET.tostring(
-            self.new_status(stale_in, heading)
+            self.new_status(stale_in, heading, groundspeed)
         ).decode()
     
     def new_chat_msg(self, stale_in = 60) -> str:
@@ -38,7 +38,7 @@ class CotUtility:
             self.new_chat(stale_in)
         ).decode()
     
-    def new_status(self, stale_in = 60, heading = 0) -> ET.Element:
+    def new_status(self, stale_in = 60, heading = 0, groundspeed = 0.0) -> ET.Element:
 
         cot = self.new_cot(stale_in)
         
@@ -65,7 +65,7 @@ class CotUtility:
 
         ET.SubElement(detail, "track", attrib={
             "course": str(heading),
-            "speed": "20.5"
+            "speed": str(groundspeed)
         })
         
         # TODO: Pull battery from mavros /mavros/battery messages
