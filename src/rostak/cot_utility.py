@@ -69,9 +69,9 @@ class CotUtility:
         })
         
         # TODO: Pull battery from mavros /mavros/battery messages
-        ET.SubElement(detail, "status", attrib={
-            "battery": "99.96"
-        })
+        #ET.SubElement(detail, "status", attrib={
+        #    "battery": "99.96"
+        #})
 
         return cot
 
