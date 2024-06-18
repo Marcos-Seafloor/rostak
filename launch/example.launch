@@ -9,7 +9,7 @@
 
         <node pkg="rostak" name="rostak_bridge" type="rostak_bridge" output="screen">
             <rosparam command="load" file="$(arg tak_params)" />
-            <env name="DEBUG" value="false" />
+            <!--<env name="DEBUG" value="false" />-->
         </node>
         
         <node pkg="rostak" name="roscot_fix" type="roscot_fix" output="screen">
