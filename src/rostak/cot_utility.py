@@ -28,7 +28,7 @@ class CotUtility:
         
         return cot
 
-    def new_status_msg(self, stale_in = 60, heading = 0 , ground_speed = 0) -> str:
+    def new_status_msg(self, stale_in = 60, heading = 0 , ground_speed = 0.0) -> str:
         return ET.tostring(
             self.new_status(stale_in, heading, ground_speed)
         ).decode()
@@ -38,7 +38,7 @@ class CotUtility:
             self.new_chat(stale_in)
         ).decode()
     
-    def new_status(self, stale_in = 60, heading = 0, ground_speed = 0) -> ET.Element:
+    def new_status(self, stale_in = 60, heading = 0, ground_speed = 0.0) -> ET.Element:
 
         cot = self.new_cot(stale_in)
         
