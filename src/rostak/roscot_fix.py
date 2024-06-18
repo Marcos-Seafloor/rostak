@@ -13,16 +13,16 @@ class RosCotFix:
         self.tx = rospy.Publisher('tak_tx', String, queue_size=1)
         self.msg = String()
         rospy.Subscriber("fix", NavSatFix, self.publish_fix)
-        self.heading = 0.0
+        self.heading = 0
+        self.speed = 0.0
         rospy.Subscriber("/mavros/vfr_hud", VFR_HUD, self.update_heading)
         rospy.loginfo(self.util.get_config())
 
     def update_heading_and_speed(self, msg):
         """Update heading from VFR_HUD message."""
         self.heading = msg.heading
-        rospy.loginfo(f"Updated heading: {self.heading}")
-        # Convert ground speed to knots
-        #self.ground_speed = msg.groundspeed * 1.94384
+        """Convert ground speed to knots"""
+        self.speed = msg.speed * 1.94384
 
     def publish_fix(self, msg):
         """Generate a status COT Event."""
@@ -33,7 +33,7 @@ class RosCotFix:
             "altitude": msg.altitude
         })
         stale_in = 2 * max(1, 1 / self.rate)
-        self.msg.data = self.util.new_status_msg(stale_in, self.heading)
+        self.msg.data = self.util.new_status_msg(stale_in, self.heading, self.speed)
         self.tx.publish(self.msg)
 
 if __name__ == '__main__':
