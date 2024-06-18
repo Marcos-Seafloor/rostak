@@ -14,29 +14,33 @@ class RosCotFix:
         self.msg = String()
         rospy.Subscriber("/mavros/global_position/global", NavSatFix, self.publish_fix)
         self.heading = 0
-        rospy.Subscriber("/mavros/vfr_hud", VFR_HUD, self.update_heading)
+        self.groundspeed = 0.0
+        rospy.Subscriber("/mavros/vfr_hud", VFR_HUD, self.update_heading_groundspeed)
         rospy.loginfo(self.util.get_config())
 
-    def update_heading(self, msg):
+    def update_heading_groundspeed(self, msg):
         """Update the heading from VFR_HUD message."""
         self.heading = msg.heading
         rospy.loginfo(f"Updated heading: {self.heading}")
+        """Update the groundspeed from VFR_HUD message and convert to knots."""
+        self.groundspeed = msg.groundspeed * 1.94384
+        rospy.loginfo(f"Updated groundspeed: {self.groundspeed}")
 
     def publish_fix(self, msg):
         """Generate a status COT Event."""
         try:
-            rospy.loginfo(f"Received NavSatFix message: {msg}")
+            #rospy.loginfo(f"Received NavSatFix message: {msg}")
             self.util.set_point({
                 "latitude": msg.latitude,
                 "longitude": msg.longitude,
                 "altitude": msg.altitude
             })
-            rospy.loginfo(f"Updated fix: {self.util.fix}")
+            #rospy.loginfo(f"Updated fix: {self.util.fix}")
             stale_in = 2 * max(1, 1 / self.rate)
-            self.msg.data = self.util.new_status_msg(stale_in, self.heading)
-            rospy.loginfo(f"Publishing status message: {self.msg.data}")
+            self.msg.data = self.util.new_status_msg(stale_in, self.heading, self.groundspeed)
+            #rospy.loginfo(f"Publishing status message: {self.msg.data}")
             self.tx.publish(self.msg)
-            rospy.loginfo("Message published successfully")
+            #rospy.loginfo("Message published successfully")
         except Exception as e:
             rospy.logerr(f"Error in publish_fix: {e}")
 
