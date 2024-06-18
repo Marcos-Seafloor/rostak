@@ -13,7 +13,7 @@ class RosCotFix:
         self.tx = rospy.Publisher('tak_tx', String, queue_size=1)
         self.msg = String()
         rospy.Subscriber("fix", NavSatFix, self.publish_fix)
-        self.heading = 0
+        self.heading = 0.0
         self.speed = 0.0
         rospy.Subscriber("/mavros/vfr_hud", VFR_HUD, self.update_heading)
         rospy.loginfo(self.util.get_config())
