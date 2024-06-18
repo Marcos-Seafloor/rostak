@@ -21,10 +21,10 @@ class RosCotFix:
     def update_heading_groundspeed(self, msg):
         """Update the heading from VFR_HUD message."""
         self.heading = msg.heading
-        rospy.loginfo(f"Updated heading: {self.heading}")
+        #rospy.loginfo(f"Updated heading: {self.heading}")
         """Update the groundspeed from VFR_HUD message and convert to knots."""
         self.groundspeed = msg.groundspeed * 1.94384
-        rospy.loginfo(f"Updated groundspeed: {self.groundspeed}")
+        #rospy.loginfo(f"Updated groundspeed: {self.groundspeed}")
 
     def publish_fix(self, msg):
         """Generate a status COT Event."""
