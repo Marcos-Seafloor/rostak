@@ -14,14 +14,15 @@ class RosCotFix:
         self.msg = String()
         rospy.Subscriber("fix", NavSatFix, self.publish_fix)
         self.heading = 0
-        self.ground_speed = 0
+        self.ground_speed = 0.0
         rospy.Subscriber("/mavros/vfr_hud", VFR_HUD, self.update_vfr_hud)
         rospy.loginfo(self.util.get_config())
 
     def update_heading_and_speed(self, msg):
         """Update heading and ground speed from VFR_HUD message."""
         self.heading = msg.heading
-        self.ground_speed = msg.groundspeed
+        # Convert ground speed to knots
+        self.ground_speed = msg.groundspeed * 1.94384
 
     def publish_fix(self, msg):
         """Generate a status COT Event."""
